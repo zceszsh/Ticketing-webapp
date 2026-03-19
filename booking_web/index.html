@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-VTOL Booking Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f8fc;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 800px;
+            max-width: 92%;
+            margin: 40px auto;
+            background: white;
+            border-radius: 14px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #1d4f91;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cfd8e3;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .passenger-box {
+            border: 1px solid #dbe5ef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            background: #f9fbfd;
+        }
+        .policy {
+            margin-top: 15px;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #fafafa;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .checkbox-row {
+            margin-top: 12px;
+        }
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: #1565c0;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0f4fa0;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        .success {
+            background: #e8f5e9;
+            color: #1b5e20;
+            border: 1px solid #a5d6a7;
+        }
+        .error {
+            background: #ffebee;
+            color: #b71c1c;
+            border: 1px solid #ef9a9a;
+        }
+        .small {
+            color: #666;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>e-VTOL Ticket Booking</h1>
+
+        <div id="messageBox" class="message"></div>
+
+        <label for="ticketType">Ticket Type</label>
+        <select id="ticketType">
+            <option value="single">Single Ticket (1 passenger)</option>
+            <option value="double">Double Ticket (2 passengers)</option>
+            <option value="triple">Triple Ticket (3 passengers)</option>
+            <option value="four">Four-Person Ticket (4 passengers)</option>
+            <option value="student">Student Ticket (1 passenger)</option>
+            <option value="child">Child Ticket (1 passenger)</option>
+        </select>
+        <div class="small">If a flight does not have enough seats, it will not appear in the list.</div>
+
+        <label for="flightSelect">Flight Time</label>
+        <select id="flightSelect"></select>
+
+        <div id="passengerContainer"></div>
+
+        <label>Safety & Privacy Agreement</label>
+        <div class="policy">
+            By booking this flight, the passenger confirms that all personal details and ID information
+            entered are accurate and valid. The operator will use this information only for booking,
+            safety verification, identity checks, and operational communication. The passenger confirms
+            that they are fit to travel and acknowledges that pregnancy, heart disease, high blood
+            pressure, or other serious medical conditions may require prior medical clearance or may
+            affect eligibility to fly. Passengers must comply with baggage rules, health declarations,
+            and all flight safety procedures.
+        </div>
+
+        <div class="checkbox-row">
+            <input type="checkbox" id="agree">
+            <label for="agree" style="display:inline; font-weight:normal;">
+                I have read and agree to the Safety & Privacy Agreement
+            </label>
+        </div>
+
+        <button id="bookBtn">Book Now</button>
+    </div>
+
+    <script>
+        const flights = [
+            { id: 1, name: "Flight A", time: "09:00", seats: 3 },
+            { id: 2, name: "Flight B", time: "11:30", seats: 0 },
+            { id: 3, name: "Flight C", time: "14:00", seats: 2 },
+            { id: 4, name: "Flight D", time: "17:30", seats: 1 }
+        ];
+
+        const ticketOptions = {
+            single: { label: "Single Ticket (1 passenger)", count: 1 },
+            double: { label: "Double Ticket (2 passengers)", count: 2 },
+            triple: { label: "Triple Ticket (3 passengers)", count: 3 },
+            four: { label: "Four-Person Ticket (4 passengers)", count: 4 },
+            student: { label: "Student Ticket (1 passenger)", count: 1 },
+            child: { label: "Child Ticket (1 passenger)", count: 1 }
+        };
+
+        const ticketTypeEl = document.getElementById("ticketType");
+        const flightSelectEl = document.getElementById("flightSelect");
+        const passengerContainerEl = document.getElementById("passengerContainer");
+        const messageBoxEl = document.getElementById("messageBox");
+        const agreeEl = document.getElementById("agree");
+        const bookBtnEl = document.getElementById("bookBtn");
+
+        function showMessage(message, type) {
+            messageBoxEl.style.display = "block";
+            messageBoxEl.className = `message ${type}`;
+            messageBoxEl.innerHTML = message;
+        }
+
+        function clearMessage() {
+            messageBoxEl.style.display = "none";
+            messageBoxEl.innerHTML = "";
+            messageBoxEl.className = "message";
+        }
+
+        function getPassengerCount() {
+            return ticketOptions[ticketTypeEl.value].count;
+        }
+
+        function renderFlights() {
+            const passengerCount = getPassengerCount();
+            const availableFlights = flights.filter(f => f.seats >= passengerCount);
+
+            flightSelectEl.innerHTML = "";
+
+            if (availableFlights.length === 0) {
+                const option = document.createElement("option");
+                option.value = "";
+                option.textContent = "No available flights for this ticket type";
+                flightSelectEl.appendChild(option);
+                return;
+            }
+
+            availableFlights.forEach(flight => {
+                const option = document.createElement("option");
+                option.value = flight.id;
+                option.textContent = `${flight.name} | Departure Time: ${flight.time} | Seats left: ${flight.seats}`;
+                flightSelectEl.appendChild(option);
+            });
+        }
+
+        function renderPassengerFields() {
+            const passengerCount = getPassengerCount();
+            passengerContainerEl.innerHTML = "";
+
+            for (let i = 0; i < passengerCount; i++) {
+                const box = document.createElement("div");
+                box.className = "passenger-box";
+                box.innerHTML = `
+                    <h3>Passenger ${i + 1}</h3>
+                    <label>Name</label>
+                    <input type="text" id="name_${i}" placeholder="Enter passenger name">
+
+                    <label>ID Number</label>
+                    <input type="text" id="id_${i}" placeholder="Enter passport / ID number">
+                `;
+                passengerContainerEl.appendChild(box);
+            }
+        }
+
+        function handleBooking() {
+            clearMessage();
+
+            const selectedTicket = ticketTypeEl.value;
+            const passengerCount = ticketOptions[selectedTicket].count;
+            const ticketLabel = ticketOptions[selectedTicket].label;
+            const selectedFlightId = parseInt(flightSelectEl.value);
+
+            const availableFlights = flights.filter(f => f.seats >= passengerCount);
+            if (availableFlights.length === 0) {
+                showMessage("No flights are available for the selected ticket type.", "error");
+                return;
+            }
+
+            if (!agreeEl.checked) {
+                showMessage("You must read and accept the Safety & Privacy Agreement before booking.", "error");
+                return;
+            }
+
+            const selectedFlight = flights.find(f => f.id === selectedFlightId);
+            if (!selectedFlight || selectedFlight.seats < passengerCount) {
+                showMessage("This flight is unavailable or does not have enough seats.", "error");
+                return;
+            }
+
+            const passengers = [];
+            for (let i = 0; i < passengerCount; i++) {
+                const name = document.getElementById(`name_${i}`).value.trim();
+                const idNum = document.getElementById(`id_${i}`).value.trim();
+
+                if (!name || !idNum) {
+                    showMessage("Please complete all passenger names and ID numbers.", "error");
+                    return;
+                }
+
+                passengers.push(`${i + 1}. ${name} | ID: ${idNum}`);
+            }
+
+            selectedFlight.seats -= passengerCount;
+
+            showMessage(
+                `<b>Booking successful!</b><br><br>
+                 Ticket type: ${ticketLabel}<br>
+                 Flight: ${selectedFlight.name} | Departure Time: ${selectedFlight.time}<br><br>
+                 <b>Passengers:</b><br>${passengers.join("<br>")}`,
+                "success"
+            );
+
+            agreeEl.checked = false;
+            renderFlights();
+            renderPassengerFields();
+        }
+
+        ticketTypeEl.addEventListener("change", () => {
+            clearMessage();
+            renderFlights();
+            renderPassengerFields();
+        });
+
+        bookBtnEl.addEventListener("click", handleBooking);
+
+        renderFlights();
+        renderPassengerFields();
+    </script>
+</body>
+</html>
