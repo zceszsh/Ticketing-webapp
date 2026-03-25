@@ -147,7 +147,8 @@
         that they are fit to travel and acknowledges that pregnancy, heart disease, high blood
         pressure, or other serious medical conditions may require prior medical clearance or may
         affect eligibility to fly. Passengers must comply with baggage rules, health declarations,
-        and all flight safety procedures.
+        and all flight safety procedures.  （Disclaimer this is for illustration purposes
+        only and does not represent a real agreement.）
       </div>
 
       <div class="checkbox-row">
@@ -171,12 +172,14 @@
     ];
 
     const ticketOptions = {
-      single: { label: "Single Ticket (1 passenger)", count: 1 },
-      double: { label: "Double Ticket (2 passengers)", count: 2 },
-      triple: { label: "Triple Ticket (3 passengers)", count: 3 },
-      four: { label: "Four-Person Ticket (4 passengers)", count: 4 },
-      student: { label: "Student Ticket (1 passenger)", count: 1 },
-      child: { label: "Child Ticket (1 passenger)", count: 1 }
+      single_short: { label: "Single Ticket Short Trip: 399GBP (1 passenger)", count: 1 },
+      double_short: { label: "Double Ticket Short Trip:  368GBP (2 passengers)", count: 2 },
+      triple_short: { label: "Triple Ticket Short Trip:  388GBP (3 passengers)", count: 3 },
+      four_short: { label: "Four-Person Ticket Short Trip: 399GBP (4 passengers)", count: 4 },
+      single_long: { label: "Single Ticket Long Trip: 749GBP (1 passenger)", count: 1 },
+      double_long: { label: "Double Ticket Long Trip:  768GBP (2 passengers)", count: 2 },
+      triple_long: { label: "Triple Ticket Long Trip:  788GBP (3 passengers)", count: 3 },
+      four_long: { label: "Four-Person Ticket Long Trip: 799GBP (4 passengers)", count: 4 },
     };
 
     const STORAGE_KEY = "evtol_flights_data";
