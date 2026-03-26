@@ -147,7 +147,8 @@
         that they are fit to travel and acknowledges that pregnancy, heart disease, high blood
         pressure, or other serious medical conditions may require prior medical clearance or may
         affect eligibility to fly. Passengers must comply with baggage rules, health declarations,
-        and all flight safety procedures.
+        and all flight safety procedures. (Disclaimer: this is for illustration purposes only and
+        does not represent a real agreement.)
       </div>
 
       <div class="checkbox-row">
@@ -171,14 +172,17 @@
     ];
 
     const ticketOptions = {
-      single: { label: "Single Ticket (1 passenger)", count: 1 },
-      double: { label: "Double Ticket (2 passengers)", count: 2 },
-      triple: { label: "Triple Ticket (3 passengers)", count: 3 },
-      four: { label: "Four-Person Ticket (4 passengers)", count: 4 },
-      student: { label: "Student Ticket (1 passenger)", count: 1 },
-      child: { label: "Child Ticket (1 passenger)", count: 1 }
+      single_short: { label: "Single Ticket - Short Trip: 399 GBP (1 passenger)", count: 1 },
+      double_short: { label: "Double Ticket - Short Trip: 368 GBP (2 passengers)", count: 2 },
+      triple_short: { label: "Triple Ticket - Short Trip: 388 GBP (3 passengers)", count: 3 },
+      four_short: { label: "Four-Person Ticket - Short Trip: 399 GBP (4 passengers)", count: 4 },
+      single_long: { label: "Single Ticket - Long Trip: 749 GBP (1 passenger)", count: 1 },
+      double_long: { label: "Double Ticket - Long Trip: 768 GBP (2 passengers)", count: 2 },
+      triple_long: { label: "Triple Ticket - Long Trip: 788 GBP (3 passengers)", count: 3 },
+      four_long: { label: "Four-Person Ticket - Long Trip: 799 GBP (4 passengers)", count: 4 }
     };
 
+    const DEFAULT_TICKET = "single_short";
     const STORAGE_KEY = "evtol_flights_data";
 
     function getFlights() {
@@ -216,8 +220,8 @@
     }
 
     function getSelectedTicket() {
-      const selected = document.getElementById("ticket_type").value || "single";
-      return ticketOptions[selected] ? selected : "single";
+      const selected = document.getElementById("ticket_type").value || DEFAULT_TICKET;
+      return ticketOptions[selected] ? selected : DEFAULT_TICKET;
     }
 
     function renderFlights() {
@@ -304,8 +308,11 @@
       const passengers = [];
 
       for (let i = 0; i < passengerCount; i++) {
-        const name = document.querySelector(`[name="name_${i}"]`).value.trim();
-        const idNum = document.querySelector(`[name="id_${i}"]`).value.trim();
+        const nameField = document.querySelector(`[name="name_${i}"]`);
+        const idField = document.querySelector(`[name="id_${i}"]`);
+
+        const name = nameField ? nameField.value.trim() : "";
+        const idNum = idField ? idField.value.trim() : "";
 
         if (!name || !idNum) {
           showMessage("Please complete all passenger names and ID numbers.", "error");
@@ -328,7 +335,7 @@
       );
 
       document.getElementById("bookingForm").reset();
-      document.getElementById("ticket_type").value = "single";
+      document.getElementById("ticket_type").value = DEFAULT_TICKET;
       refreshUI(false);
     }
 
@@ -341,16 +348,18 @@
     document.getElementById("resetBtn").addEventListener("click", () => {
       resetFlights();
       document.getElementById("bookingForm").reset();
-      document.getElementById("ticket_type").value = "single";
+      document.getElementById("ticket_type").value = DEFAULT_TICKET;
       refreshUI();
       showMessage("Flight data has been reset.", "success");
     });
 
     populateTicketOptions();
-    document.getElementById("ticket_type").value = "single";
+    document.getElementById("ticket_type").value = DEFAULT_TICKET;
+
     if (!localStorage.getItem(STORAGE_KEY)) {
       saveFlights(defaultFlights);
     }
+
     refreshUI();
   </script>
 </body>
